@@ -1,0 +1,33 @@
+# Local data: databases, raw statements, model artifacts. Never commit.
+data/*
+!data/.gitkeep
+*.duckdb
+*.duckdb.wal
+
+# Real statements must never be committed; only synthetic fixtures are allowed.
+*.csv
+*.CSV
+!tests/fixtures/**/*.csv
+*.pdf
+!tests/fixtures/**/*.pdf
+
+# Secrets
+.env
+
+# Python / tooling
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
