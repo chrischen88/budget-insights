@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from pathlib import Path
 
 import duckdb
 import pytest
@@ -12,3 +13,10 @@ def db() -> Iterator[duckdb.DuckDBPyConnection]:
     conn = connect(":memory:")
     yield conn
     conn.close()
+
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def fixture_bytes(name: str) -> bytes:
+    return (FIXTURES / name).read_bytes()

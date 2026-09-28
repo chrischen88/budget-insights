@@ -1,0 +1,259 @@
+{"id": "m001", "description": "STARBUCKS STORE 05512", "expected_name": "Starbucks", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m002", "description": "DUTCH BROS #0123", "expected_name": "Dutch Bros", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m003", "description": "SQ *BLUE BOTTLE COFFEE", "expected_name": "Blue Bottle Coffee", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m004", "description": "PEETS #11203", "expected_name": "Peet's Coffee", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m005", "description": "TST* INTELLIGENTSIA COFFEE", "expected_name": "Intelligentsia Coffee", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m006", "description": "TIM HORTONS #1234", "expected_name": "Tim Hortons", "accept_categories": ["Coffee Shops", "Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m007", "description": "DUNKIN #342118", "expected_name": "Dunkin'", "accept_categories": ["Coffee Shops", "Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m008", "description": "PHILZ COFFEE 012", "expected_name": "Philz Coffee", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m009", "description": "CARIBOU COFFEE #0412", "expected_name": "Caribou Coffee", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m010", "description": "COFFEE BEAN & TEA LEAF 123", "expected_name": "The Coffee Bean & Tea Leaf", "accept_categories": ["Coffee Shops"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m011", "description": "OLIVE GARDEN 0042", "expected_name": "Olive Garden", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m012", "description": "CHEESECAKE FACTORY #0045", "expected_name": "The Cheesecake Factory", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m013", "description": "PF CHANGS #9933", "expected_name": "P.F. Chang's", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m014", "description": "RED ROBIN NO 234", "expected_name": "Red Robin", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m015", "description": "APPLEBEES 1234", "expected_name": "Applebee's", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m016", "description": "TEXAS ROADHOUSE #211", "expected_name": "Texas Roadhouse", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m017", "description": "BJS RESTAURANTS 0512", "expected_name": "BJ's Restaurant", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m018", "description": "OUTBACK 4412", "expected_name": "Outback Steakhouse", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m019", "description": "DENNY'S #7781", "expected_name": "Denny's", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m020", "description": "IHOP #3321", "expected_name": "IHOP", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m021", "description": "TST* SWEETGREEN 123", "expected_name": "Sweetgreen", "accept_categories": ["Restaurants", "Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m022", "description": "TST*SHAKE SHACK #1234", "expected_name": "Shake Shack", "accept_categories": ["Fast Food", "Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m023", "description": "CRACKER BARREL #551", "expected_name": "Cracker Barrel", "accept_categories": ["Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m024", "description": "BUFFALO WILD WINGS 0231", "expected_name": "Buffalo Wild Wings", "accept_categories": ["Restaurants", "Alcohol & Bars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m025", "description": "NOODLES & CO 0321", "expected_name": "Noodles & Company", "accept_categories": ["Restaurants", "Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m026", "description": "MCDONALD'S F12345", "expected_name": "McDonald's", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m027", "description": "CHIPOTLE 1234", "expected_name": "Chipotle", "accept_categories": ["Fast Food", "Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m028", "description": "TACO BELL #031245", "expected_name": "Taco Bell", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m029", "description": "CHICK-FIL-A #01234", "expected_name": "Chick-fil-A", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m030", "description": "WENDYS #1234", "expected_name": "Wendy's", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m031", "description": "BURGER KING #1234", "expected_name": "Burger King", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m032", "description": "SUBWAY 12345", "expected_name": "Subway", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m033", "description": "PANERA BREAD #601234", "expected_name": "Panera Bread", "accept_categories": ["Fast Food", "Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m034", "description": "FIVE GUYS 1234", "expected_name": "Five Guys", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m035", "description": "IN-N-OUT BURGER 123", "expected_name": "In-N-Out Burger", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m036", "description": "DOMINO'S 1234", "expected_name": "Domino's", "accept_categories": ["Fast Food", "Food Delivery"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m037", "description": "PIZZA HUT 012345", "expected_name": "Pizza Hut", "accept_categories": ["Fast Food", "Restaurants"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m038", "description": "POPEYES 1234", "expected_name": "Popeyes", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m039", "description": "JACK IN THE BOX 1234", "expected_name": "Jack in the Box", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m040", "description": "PANDA EXPRESS #1234", "expected_name": "Panda Express", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m041", "description": "KFC J123456", "expected_name": "KFC", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m042", "description": "SONIC DRIVE IN #1234", "expected_name": "Sonic Drive-In", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m043", "description": "JIMMY JOHNS - 1234", "expected_name": "Jimmy John's", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m044", "description": "WINGSTOP 123", "expected_name": "Wingstop", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m045", "description": "RAISING CANES 0123", "expected_name": "Raising Cane's", "accept_categories": ["Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m046", "description": "DOORDASH*CHIPOTLE", "expected_name": "DoorDash", "accept_categories": ["Food Delivery"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m047", "description": "UBER *EATS", "expected_name": "Uber Eats", "accept_categories": ["Food Delivery"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m048", "description": "GRUBHUB*SUSHIPLACE", "expected_name": "Grubhub", "accept_categories": ["Food Delivery"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m049", "description": "INSTACART*SUBSCRIPTION", "expected_name": "Instacart", "accept_categories": ["Food Delivery", "Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m050", "description": "POSTMATES", "expected_name": "Postmates", "accept_categories": ["Food Delivery"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m051", "description": "SEAMLESS*THAI KITCHEN", "expected_name": "Seamless", "accept_categories": ["Food Delivery"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m052", "description": "TRADER JOE S #123  QPS", "expected_name": "Trader Joe's", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m053", "description": "KROGER #123", "expected_name": "Kroger", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m054", "description": "SAFEWAY #1234", "expected_name": "Safeway", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m055", "description": "PUBLIX #1234", "expected_name": "Publix", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m056", "description": "H-E-B #123", "expected_name": "H-E-B", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m057", "description": "ALDI 12345", "expected_name": "Aldi", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m058", "description": "WEGMANS #123", "expected_name": "Wegmans", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m059", "description": "SPROUTS FARMERS MKT#123", "expected_name": "Sprouts Farmers Market", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m060", "description": "COSTCO WHSE #0123", "expected_name": "Costco", "accept_categories": ["Groceries", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m061", "description": "SAMSCLUB #1234", "expected_name": "Sam's Club", "accept_categories": ["Groceries", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m062", "description": "WINCO FOODS #12", "expected_name": "WinCo Foods", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m063", "description": "FOOD LION #1234", "expected_name": "Food Lion", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m064", "description": "GIANT EAGLE #1234", "expected_name": "Giant Eagle", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m065", "description": "STOP & SHOP 0123", "expected_name": "Stop & Shop", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m066", "description": "RALPHS #0123", "expected_name": "Ralphs", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m067", "description": "HARRIS TEETER #123", "expected_name": "Harris Teeter", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m068", "description": "MEIJER # 123", "expected_name": "Meijer", "accept_categories": ["Groceries", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m069", "description": "SHOPRITE BRICK T1", "expected_name": "ShopRite", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m070", "description": "VONS #1234", "expected_name": "Vons", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m071", "description": "ALBERTSONS #1234", "expected_name": "Albertsons", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m072", "description": "H MART - FORT LEE", "expected_name": "H Mart", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m073", "description": "99 RANCH #1776", "expected_name": "99 Ranch Market", "accept_categories": ["Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m074", "description": "BEVMO #123", "expected_name": "BevMo!", "accept_categories": ["Alcohol & Bars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m075", "description": "TOTAL WINE AND MORE 123", "expected_name": "Total Wine & More", "accept_categories": ["Alcohol & Bars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m076", "description": "SPEC'S WINE SPIRITS #45", "expected_name": "Spec's Wine, Spirits & Finer Foods", "accept_categories": ["Alcohol & Bars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m077", "description": "BINNY'S BEVERAGE DEPOT", "expected_name": "Binny's Beverage Depot", "accept_categories": ["Alcohol & Bars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m078", "description": "SHELL OIL 57444353 SAN JOSE CA", "expected_name": "Shell", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m079", "description": "CHEVRON 0201234", "expected_name": "Chevron", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m080", "description": "EXXONMOBIL 4512", "expected_name": "ExxonMobil", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m081", "description": "BP#1234567", "expected_name": "BP", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m082", "description": "ARCO #01234", "expected_name": "ARCO", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m083", "description": "SPEEDWAY 01234", "expected_name": "Speedway", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m084", "description": "WAWA 1234", "expected_name": "Wawa", "accept_categories": ["Gas & Fuel", "Fast Food"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m085", "description": "SUNOCO 0123", "expected_name": "Sunoco", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m086", "description": "MARATHON PETRO123", "expected_name": "Marathon", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m087", "description": "VALERO 1234", "expected_name": "Valero", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m088", "description": "CIRCLE K # 01234", "expected_name": "Circle K", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m089", "description": "QT 1234", "expected_name": "QuikTrip", "accept_categories": ["Gas & Fuel"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m090", "description": "UBER *TRIP HELP.UBER.COM CA", "expected_name": "Uber", "accept_categories": ["Rideshare & Taxi"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m091", "description": "LYFT *RIDE SUN 8PM", "expected_name": "Lyft", "accept_categories": ["Rideshare & Taxi"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m092", "description": "CURB NYC TAXI", "expected_name": "Curb", "accept_categories": ["Rideshare & Taxi"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m093", "description": "MTA*NYCT PAYGO", "expected_name": "MTA New York City Transit", "accept_categories": ["Public Transit"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m094", "description": "CLIPPER SERVICE CONCORD CA", "expected_name": "Clipper", "accept_categories": ["Public Transit"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m095", "description": "WMATA", "expected_name": "WMATA Metro", "accept_categories": ["Public Transit"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m096", "description": "SEPTA KEY", "expected_name": "SEPTA", "accept_categories": ["Public Transit"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m097", "description": "MBTA-CHARLIE", "expected_name": "MBTA", "accept_categories": ["Public Transit"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m098", "description": "VENTRA CHICAGO", "expected_name": "Ventra", "accept_categories": ["Public Transit"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m099", "description": "PARKMOBILE", "expected_name": "ParkMobile", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m100", "description": "SPOTHERO", "expected_name": "SpotHero", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m101", "description": "E-ZPASS REPLENISH", "expected_name": "E-ZPass", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m102", "description": "FASTRAK CSC", "expected_name": "FasTrak", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m103", "description": "SUNPASS*ACC0123456", "expected_name": "SunPass", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m104", "description": "LAZ PARKING 1234", "expected_name": "LAZ Parking", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m105", "description": "PAYBYPHONE", "expected_name": "PayByPhone", "accept_categories": ["Parking & Tolls"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m106", "description": "JIFFY LUBE #1234", "expected_name": "Jiffy Lube", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m107", "description": "AUTOZONE #1234", "expected_name": "AutoZone", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m108", "description": "O'REILLY AUTO 1234", "expected_name": "O'Reilly Auto Parts", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m109", "description": "FIRESTONE #012345", "expected_name": "Firestone Complete Auto Care", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m110", "description": "VALVOLINE #1234", "expected_name": "Valvoline Instant Oil Change", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m111", "description": "DISCOUNT TIRE #0412", "expected_name": "Discount Tire", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m112", "description": "PEP BOYS #123", "expected_name": "Pep Boys", "accept_categories": ["Auto Maintenance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m113", "description": "GEICO *AUTO", "expected_name": "GEICO", "accept_categories": ["Auto Insurance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m114", "description": "PROGRESSIVE *INSURANCE", "expected_name": "Progressive", "accept_categories": ["Auto Insurance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m115", "description": "ALLSTATE INSURANCE", "expected_name": "Allstate", "accept_categories": ["Auto Insurance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m116", "description": "TARGET        00012345", "expected_name": "Target", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m117", "description": "WAL-MART #1234", "expected_name": "Walmart", "accept_categories": ["General Merchandise", "Groceries"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m118", "description": "AMAZON.COM*2K4AB1C23 AMZN.COM/BILL WA", "expected_name": "Amazon", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m119", "description": "DOLLAR TREE #1234", "expected_name": "Dollar Tree", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m120", "description": "DOLLAR GENERAL #1234", "expected_name": "Dollar General", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m121", "description": "BIG LOTS #0123", "expected_name": "Big Lots", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m122", "description": "ETSY.COM", "expected_name": "Etsy", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m123", "description": "EBAY O*12-34567-89012", "expected_name": "eBay", "accept_categories": ["General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m124", "description": "TJMAXX #0123", "expected_name": "TJ Maxx", "accept_categories": ["General Merchandise", "Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m125", "description": "ROSS STORES #123", "expected_name": "Ross Dress for Less", "accept_categories": ["Clothing", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m126", "description": "KOHLS #1234", "expected_name": "Kohl's", "accept_categories": ["Clothing", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m127", "description": "MACYS .COM", "expected_name": "Macy's", "accept_categories": ["Clothing", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m128", "description": "OLD NAVY US 1234", "expected_name": "Old Navy", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m129", "description": "GAP US 1234", "expected_name": "Gap", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m130", "description": "H&M0123", "expected_name": "H&M", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m131", "description": "ZARA USA 3456", "expected_name": "Zara", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m132", "description": "UNIQLO USA", "expected_name": "Uniqlo", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m133", "description": "NIKE.COM", "expected_name": "Nike", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m134", "description": "LULULEMON ATHLETICA", "expected_name": "Lululemon", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m135", "description": "NORDSTROM #0123", "expected_name": "Nordstrom", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m136", "description": "FOOT LOCKER #01234", "expected_name": "Foot Locker", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m137", "description": "J.CREW #123", "expected_name": "J.Crew", "accept_categories": ["Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m138", "description": "BEST BUY 00012345", "expected_name": "Best Buy", "accept_categories": ["Electronics"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m139", "description": "APPLE STORE #R123", "expected_name": "Apple Store", "accept_categories": ["Electronics"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m140", "description": "MICRO CENTER #045", "expected_name": "Micro Center", "accept_categories": ["Electronics"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m141", "description": "B&H PHOTO 800-555-0100 NY", "expected_name": "B&H Photo", "accept_categories": ["Electronics"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m142", "description": "NEWEGG MARKETPLACE", "expected_name": "Newegg", "accept_categories": ["Electronics"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m143", "description": "THE HOME DEPOT #1234", "expected_name": "The Home Depot", "accept_categories": ["Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m144", "description": "LOWE'S #1234", "expected_name": "Lowe's", "accept_categories": ["Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m145", "description": "ACE HDWE #01234", "expected_name": "Ace Hardware", "accept_categories": ["Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m146", "description": "MENARDS 3021", "expected_name": "Menards", "accept_categories": ["Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m147", "description": "HARBOR FREIGHT TOOLS 123", "expected_name": "Harbor Freight Tools", "accept_categories": ["Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m148", "description": "SHERWIN-WILLIAMS #4412", "expected_name": "Sherwin-Williams", "accept_categories": ["Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m149", "description": "IKEA US 0123", "expected_name": "IKEA", "accept_categories": ["Home Supplies", "Home Improvement"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m150", "description": "WAYFAIR*1234567890", "expected_name": "Wayfair", "accept_categories": ["Home Supplies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m151", "description": "HOMEGOODS #0123", "expected_name": "HomeGoods", "accept_categories": ["Home Supplies", "General Merchandise"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m152", "description": "THE CONTAINER STORE #45", "expected_name": "The Container Store", "accept_categories": ["Home Supplies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m153", "description": "BILT RENT", "expected_name": "Bilt Rent", "accept_categories": ["Rent & Mortgage"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m154", "description": "ROCKET MORTGAGE", "expected_name": "Rocket Mortgage", "accept_categories": ["Rent & Mortgage"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m155", "description": "WELLS FARGO HOME MTG AUTO PAY", "expected_name": "Wells Fargo Home Mortgage", "accept_categories": ["Rent & Mortgage"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m156", "description": "PGANDE WEB ONLINE", "expected_name": "PG&E", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m157", "description": "CON ED OF NY", "expected_name": "Con Edison", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m158", "description": "DUKE ENERGY PAYMENT", "expected_name": "Duke Energy", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m159", "description": "COMED", "expected_name": "ComEd", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m160", "description": "SOCALGAS", "expected_name": "SoCalGas", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m161", "description": "XCEL ENERGY-NSP", "expected_name": "Xcel Energy", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m162", "description": "GEORGIA POWER", "expected_name": "Georgia Power", "accept_categories": ["Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m163", "description": "COMCAST CABLE COMM PPD ID: 0000000000", "expected_name": "Comcast Xfinity", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m164", "description": "XFINITY MOBILE", "expected_name": "Xfinity Mobile", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m165", "description": "VZWRLSS*APOCC VISB", "expected_name": "Verizon Wireless", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m166", "description": "AT&T*BILL PAYMENT", "expected_name": "AT&T", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m167", "description": "T-MOBILE AUTOPAY", "expected_name": "T-Mobile", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m168", "description": "SPECTRUM", "expected_name": "Spectrum", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m169", "description": "MINT MOBILE", "expected_name": "Mint Mobile", "accept_categories": ["Internet & Phone"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m170", "description": "WASTE MANAGEMENT", "expected_name": "Waste Management", "accept_categories": ["Water & Trash"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m171", "description": "REPUBLIC SERVICES", "expected_name": "Republic Services", "accept_categories": ["Water & Trash"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m172", "description": "SEATTLE PUBLIC UTILITIES", "expected_name": "Seattle Public Utilities", "accept_categories": ["Water & Trash", "Electric & Gas"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m173", "description": "NETFLIX.COM 866-555-0100 CA", "expected_name": "Netflix", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m174", "description": "HULU 877-5550100 CA", "expected_name": "Hulu", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m175", "description": "SPOTIFY USA", "expected_name": "Spotify", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m176", "description": "DISNEY PLUS", "expected_name": "Disney+", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m177", "description": "GOOGLE *YOUTUBE PREMIUM G.CO/HELPPAY#", "expected_name": "YouTube Premium", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m178", "description": "PARAMOUNT+", "expected_name": "Paramount+", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m179", "description": "PEACOCK TV", "expected_name": "Peacock", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m180", "description": "SIRIUSXM RADIO", "expected_name": "SiriusXM", "accept_categories": ["Streaming Services"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m181", "description": "AUDIBLE*AB12CD34E", "expected_name": "Audible", "accept_categories": ["Streaming Services", "Books & Supplies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m182", "description": "APPLE.COM/BILL 866-555-0199 CA", "expected_name": "Apple", "accept_categories": ["Streaming Services", "Games", "Electronics"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m183", "description": "AMC 1234 ONLINE", "expected_name": "AMC Theatres", "accept_categories": ["Movies & Events"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m184", "description": "REGAL CINEMAS", "expected_name": "Regal Cinemas", "accept_categories": ["Movies & Events"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m185", "description": "FANDANGO", "expected_name": "Fandango", "accept_categories": ["Movies & Events"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m186", "description": "TICKETMASTER", "expected_name": "Ticketmaster", "accept_categories": ["Movies & Events"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m187", "description": "STUBHUB", "expected_name": "StubHub", "accept_categories": ["Movies & Events"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m188", "description": "EVENTBRITE", "expected_name": "Eventbrite", "accept_categories": ["Movies & Events"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m189", "description": "MICHAELS STORES 1234", "expected_name": "Michaels", "accept_categories": ["Hobbies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m190", "description": "JOANN STORES #1234", "expected_name": "JOANN", "accept_categories": ["Hobbies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m191", "description": "GUITAR CENTER #123", "expected_name": "Guitar Center", "accept_categories": ["Hobbies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m192", "description": "HOBBY LOBBY #123", "expected_name": "Hobby Lobby", "accept_categories": ["Hobbies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m193", "description": "REI #12 BOULDER", "expected_name": "REI", "accept_categories": ["Hobbies", "Clothing"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m194", "description": "STEAMGAMES.COM 4259522985", "expected_name": "Steam", "accept_categories": ["Games"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m195", "description": "PLAYSTATION NETWORK", "expected_name": "PlayStation Network", "accept_categories": ["Games"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m196", "description": "MICROSOFT*XBOX", "expected_name": "Xbox", "accept_categories": ["Games"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m197", "description": "NINTENDO CD1234567", "expected_name": "Nintendo", "accept_categories": ["Games"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m198", "description": "GAMESTOP #1234", "expected_name": "GameStop", "accept_categories": ["Games"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m199", "description": "CVS/PHARMACY #01234", "expected_name": "CVS Pharmacy", "accept_categories": ["Pharmacy"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m200", "description": "WALGREENS #1234", "expected_name": "Walgreens", "accept_categories": ["Pharmacy"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m201", "description": "RITE AID 01234", "expected_name": "Rite Aid", "accept_categories": ["Pharmacy"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m202", "description": "QUEST DIAGNOSTICS", "expected_name": "Quest Diagnostics", "accept_categories": ["Doctor & Dental"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m203", "description": "LABCORP", "expected_name": "Labcorp", "accept_categories": ["Doctor & Dental"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m204", "description": "ASPEN DENTAL", "expected_name": "Aspen Dental", "accept_categories": ["Doctor & Dental"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m205", "description": "ONE MEDICAL", "expected_name": "One Medical", "accept_categories": ["Doctor & Dental"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m206", "description": "PLANET FITNESS", "expected_name": "Planet Fitness", "accept_categories": ["Fitness"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m207", "description": "EQUINOX #123", "expected_name": "Equinox", "accept_categories": ["Fitness"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m208", "description": "ORANGETHEORY #0123", "expected_name": "Orangetheory Fitness", "accept_categories": ["Fitness"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m209", "description": "PELOTON* MEMBERSHIP", "expected_name": "Peloton", "accept_categories": ["Fitness"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m210", "description": "CLASSPASS", "expected_name": "ClassPass", "accept_categories": ["Fitness"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m211", "description": "BCBS OF TEXAS", "expected_name": "Blue Cross Blue Shield", "accept_categories": ["Health Insurance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m212", "description": "UNITEDHEALTHCARE", "expected_name": "UnitedHealthcare", "accept_categories": ["Health Insurance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m213", "description": "AETNA", "expected_name": "Aetna", "accept_categories": ["Health Insurance"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m214", "description": "UNITED 0162345678901", "expected_name": "United Airlines", "accept_categories": ["Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m215", "description": "DELTA AIR 0062345678901", "expected_name": "Delta Air Lines", "accept_categories": ["Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m216", "description": "AMERICAN AIR0012345678901", "expected_name": "American Airlines", "accept_categories": ["Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m217", "description": "SOUTHWES 5262345678901", "expected_name": "Southwest Airlines", "accept_categories": ["Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m218", "description": "JETBLUE 2792345678901", "expected_name": "JetBlue", "accept_categories": ["Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m219", "description": "ALASKA AIR 0272345678901", "expected_name": "Alaska Airlines", "accept_categories": ["Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m220", "description": "MARRIOTT DOWNTOWN", "expected_name": "Marriott", "accept_categories": ["Lodging"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m221", "description": "HILTON HOTELS", "expected_name": "Hilton", "accept_categories": ["Lodging"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m222", "description": "AIRBNB * HMABCD1234", "expected_name": "Airbnb", "accept_categories": ["Lodging"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m223", "description": "HYATT REGENCY", "expected_name": "Hyatt", "accept_categories": ["Lodging"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m224", "description": "VRBO", "expected_name": "Vrbo", "accept_categories": ["Lodging"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m225", "description": "EXPEDIA 7212345678901", "expected_name": "Expedia", "accept_categories": ["Lodging", "Flights"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m226", "description": "HERTZ RENT-A-CAR", "expected_name": "Hertz", "accept_categories": ["Rental Cars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m227", "description": "ENTERPRISE RENT-A-CAR", "expected_name": "Enterprise Rent-A-Car", "accept_categories": ["Rental Cars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m228", "description": "AVIS RENT A CAR", "expected_name": "Avis", "accept_categories": ["Rental Cars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m229", "description": "TURO INC", "expected_name": "Turo", "accept_categories": ["Rental Cars"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m230", "description": "GREAT CLIPS #1234", "expected_name": "Great Clips", "accept_categories": ["Hair & Beauty"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m231", "description": "SUPERCUTS #1234", "expected_name": "Supercuts", "accept_categories": ["Hair & Beauty"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m232", "description": "SEPHORA #0123", "expected_name": "Sephora", "accept_categories": ["Hair & Beauty"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m233", "description": "ULTA #123", "expected_name": "Ulta Beauty", "accept_categories": ["Hair & Beauty"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m234", "description": "SQ *CITY LAUNDROMAT", "expected_name": "City Laundromat", "accept_categories": ["Laundry & Dry Cleaning"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m235", "description": "RINSE INC", "expected_name": "Rinse", "accept_categories": ["Laundry & Dry Cleaning"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m236", "description": "COURSERA", "expected_name": "Coursera", "accept_categories": ["Tuition & Courses"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m237", "description": "UDEMY", "expected_name": "Udemy", "accept_categories": ["Tuition & Courses"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m238", "description": "MASTERCLASS", "expected_name": "MasterClass", "accept_categories": ["Tuition & Courses"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m239", "description": "BARNES & NOBLE #1234", "expected_name": "Barnes & Noble", "accept_categories": ["Books & Supplies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m240", "description": "HALF PRICE BOOKS #45", "expected_name": "Half Price Books", "accept_categories": ["Books & Supplies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m241", "description": "KINDLE SVCS*AB1CD2EF3", "expected_name": "Kindle", "accept_categories": ["Books & Supplies"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m242", "description": "1-800-FLOWERS.COM", "expected_name": "1-800-Flowers", "accept_categories": ["Gifts"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m243", "description": "EDIBLE ARRANGEMENTS #123", "expected_name": "Edible Arrangements", "accept_categories": ["Gifts"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m244", "description": "HALLMARK #0123", "expected_name": "Hallmark", "accept_categories": ["Gifts"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m245", "description": "AMERICAN RED CROSS", "expected_name": "American Red Cross", "accept_categories": ["Charity"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m246", "description": "UNICEF USA", "expected_name": "UNICEF USA", "accept_categories": ["Charity"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m247", "description": "GOFUNDME", "expected_name": "GoFundMe", "accept_categories": ["Charity", "Gifts"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m248", "description": "WIKIMEDIA FOUNDATION", "expected_name": "Wikimedia Foundation", "accept_categories": ["Charity"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m249", "description": "FOREIGN TRANSACTION FEE", "expected_name": "Foreign Transaction Fee", "accept_categories": ["Bank Fees"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m250", "description": "PURCHASE INTEREST CHARGE", "expected_name": "Purchase Interest Charge", "accept_categories": ["Interest Charges"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m251", "description": "NON-CHASE ATM FEE-WITH", "expected_name": "Non-Chase ATM Fee", "accept_categories": ["ATM Fees", "Bank Fees"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m252", "description": "INTEREST PAYMENT", "expected_name": "Interest Payment", "accept_categories": ["Interest Income"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m253", "description": "ACME CORP PAYROLL PPD ID: 0000000000", "expected_name": "Acme Corp Payroll", "accept_categories": ["Paycheck"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m254", "description": "IRS TREAS 310 TAX REF", "expected_name": "IRS Tax Refund", "accept_categories": ["Refunds & Reimbursements", "Other Income"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m255", "description": "SQ *JKL VENTURES LLC", "expected_name": "JKL Ventures", "accept_categories": ["Unknown"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m256", "description": "PAYPAL *XR32 HOLDINGS", "expected_name": "XR32 Holdings", "accept_categories": ["Unknown"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m257", "description": "SP * MNO TRADING", "expected_name": "MNO Trading", "accept_categories": ["Unknown"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m258", "description": "POS DEBIT ZTQ SERVICES", "expected_name": "ZTQ Services", "accept_categories": ["Unknown"], "label_source": "claude-authored; needs human spot-check"}
+{"id": "m259", "description": "ACH DEBIT BLK MGMT 4412", "expected_name": "BLK Mgmt", "accept_categories": ["Unknown", "Rent & Mortgage"], "label_source": "claude-authored; needs human spot-check"}

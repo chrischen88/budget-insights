@@ -94,19 +94,22 @@ transactions (
   chase_category   TEXT,
   chase_type       TEXT,
   memo             TEXT,
-  merchant_id      INTEGER REFERENCES merchants(id),
-  category_id      INTEGER REFERENCES categories(id),
+  merchant_id      INTEGER,            -- merchants.id (not a FK: see note below)
+  category_id      INTEGER,            -- categories.id (not a FK: see note below)
   category_source  TEXT,               -- 'rule' | 'user' | 'ml' | 'llm' | 'chase'
   category_conf    DOUBLE,
   is_transfer      BOOLEAN DEFAULT FALSE,
-  is_excluded      BOOLEAN DEFAULT FALSE
+  is_excluded      BOOLEAN DEFAULT FALSE,
+  transfer_candidate BOOLEAN DEFAULT FALSE, -- looks like a transfer (§5.3); unpaired = needs review
+  transfer_pair_id TEXT,               -- id of the matched opposite side, when paired
+  category_locked  BOOLEAN DEFAULT FALSE -- per-transaction user override; cascade skips it
 );
 
 merchants (
   id             INTEGER PRIMARY KEY,
   normalized_key TEXT UNIQUE,          -- description after deterministic cleanup
   clean_name     TEXT,                 -- 'Blue Bottle Coffee'
-  default_category_id INTEGER REFERENCES categories(id),
+  default_category_id INTEGER,         -- categories.id (not a FK: see note below)
   source         TEXT,                 -- 'llm' | 'user'
   confidence     DOUBLE
 );
@@ -114,7 +117,7 @@ merchants (
 categories (
   id        INTEGER PRIMARY KEY,
   name      TEXT UNIQUE NOT NULL,      -- 'Coffee Shops'
-  parent_id INTEGER REFERENCES categories(id),  -- 'Food & Dining'
+  parent_id INTEGER,                   -- categories.id, e.g. 'Food & Dining' (not a FK)
   is_income BOOLEAN DEFAULT FALSE
 );
 
@@ -125,6 +128,11 @@ category_rules (
   priority    INTEGER DEFAULT 100,
   created_by  TEXT                     -- 'seed' | 'user'
 );
+
+chase_category_mappings (
+  chase_category TEXT PRIMARY KEY,     -- Chase card category, e.g. 'Food & Drink'
+  category_id    INTEGER NOT NULL REFERENCES categories(id)
+);                                     -- seeded; editable in Settings
 
 recurring_series (
   id            INTEGER PRIMARY KEY,
@@ -153,6 +161,8 @@ llm_cache (
 
 Seed `categories` with a two-level taxonomy (~12 parents, ~40 children). Users can add/rename.
 
+**Foreign keys on edited columns.** DuckDB runs an UPDATE of an indexed (e.g. foreign-key) column as delete + insert, which fails when other rows reference the table. So reference columns the app edits (`categories.parent_id`, `merchants.default_category_id`, `transactions.merchant_id`, `transactions.category_id`) are plain integers (migration 008). Repository writers validate them and `repository.integrity_problems()` checks for dangling references. Rule for new tables: a table that others reference must not have a foreign key on a column the app updates.
+
 ---
 
 ## 5. Pipeline
@@ -175,21 +185,31 @@ where `occurrence_index` is the 0-based count of identical (date, amount, descri
 Credit card payments appear twice (checking outflow + card inflow). Mark both sides `is_transfer = TRUE` and exclude from spend totals.
 - Card side: `chase_type = 'Payment'`.
 - Checking side: description matches seeded patterns (e.g. `CHASE CREDIT CRD AUTOPAY`, `Payment to Chase card ending in NNNN`).
-- Pair when amounts are equal and opposite within ±5 days. Unpaired candidates are flagged for review, not silently excluded.
-- Same logic for transfers between the user's own checking/savings accounts.
+- Pair when amounts are equal and opposite, in different accounts, within ±5 days. If a description names a card (`ending in NNNN`), it only pairs with the card account with that last4. Matching is one-to-one, closest dates first.
+- Paired rows: `is_transfer = TRUE` and `transfer_pair_id` points at each other. Unpaired candidates get `transfer_candidate = TRUE` but keep `is_transfer = FALSE`, so they still count until reviewed. They are flagged, not silently excluded.
+- Same logic for transfers between the user's own checking/savings accounts (`Online Transfer to/from`).
+- Detection re-runs after every import and only considers unpaired rows, so a payment pairs once its other side is imported later, and existing pairs never change.
 
 ### 5.4 Merchant normalization
-1. **Deterministic cleanup** → `normalized_key`: strip processor prefixes (`SQ *`, `TST*`, `PAYPAL *`, `SP `), trailing store numbers, city/state suffixes, phone numbers, and reference IDs.
+1. **Deterministic cleanup** → `normalized_key` (`enrich/merchants.py`): strip processor prefixes (`SQ *`, `TST*`, `PAYPAL *`, `SP `, `DD *`), debit-card wrappers (`CARD PURCHASE 01/05 …`), ACH IDs, phone numbers, dates, `*reference` codes, and everything from the first store number or billing domain onward, plus a trailing state code. State codes that are also words (`IN`, `OR`, `ME`, `OK`, `HI`, `CO`) are only dropped from fixed-width location fields. Cleanup is idempotent: normalizing a key returns the same key.
+   Every transaction is linked to a `merchants` row by key at import. Until a clean name exists, views show the key as the merchant name.
 2. Look up `normalized_key` in `merchants`. Hit → done.
 3. Miss → batch unknown keys (up to 50 per call) to the LLM, which returns `{clean_name, suggested_category, confidence}` per key. Cache in `llm_cache` and insert into `merchants`.
+   - Only merchants with `source IS NULL` are sent; a processed merchant gets `source = 'llm'` even when the model gave no usable category, so it is not sent again. User-set merchants are never overwritten.
+   - **Never sent:** peer-to-peer payments (Zelle, Venmo, Cash App, Apple Cash, PayPal transfers), whose keys carry people's names and don't say what the payment was for, and merchants that only appear on transfers. Categorize P2P with user rules.
+   - Merchants go out as `{id, description}` and come back by `id`, so redaction can rewrite a description without breaking the match. Names containing a redaction placeholder are discarded.
+   - A failed batch leaves its merchants unnamed for the next import; the import itself never fails because of the LLM.
 
 ### 5.5 Categorization (cascade, first match wins)
-1. **User override** on that specific transaction.
-2. **User/seed rule** (`category_rules`, by priority).
-3. **Merchant default** (`merchants.default_category_id`, set by user or LLM).
+1. **User override** on that specific transaction: sets `category_locked = TRUE` (`source = 'user'`, conf 1.0). The cascade never touches locked rows.
+2. **User/seed rule** (`category_rules`): regex matched case-insensitively anywhere in `raw_description`; lower `priority` number runs first, ties by rule id. User rules default to 100, seed rules use 200, so user rules win. Invalid patterns are skipped and logged by rule id. (`source = 'rule'`, conf 1.0.)
+3. **Merchant default** (`merchants.default_category_id`, set by user or LLM): `source` is the merchant's source (`'user'` conf 1.0, or `'llm'` with its confidence). Unlike an override it is recomputed, so changing a merchant's default moves all its unlocked transactions.
 4. **ML classifier** if confidence ≥ threshold (default 0.75).
-5. **LLM** suggestion from merchant normalization.
-6. **Fallback** mapping from `chase_category` → our taxonomy.
+5. **LLM** suggestion from merchant normalization: a merchant default with `source = 'llm'` (conf = the model's confidence). It ranks below a user-set merchant default and below the ML classifier.
+6. **Fallback** mapping from `chase_category` → our taxonomy via `chase_category_mappings` (matched case-insensitively; `category_source = 'chase'`, `category_conf = 0.5`).
+7. Nothing matches → uncategorized.
+
+The cascade re-runs over every unlocked transaction after each import, so edits to rules, merchant defaults or the Chase mapping take effect everywhere they apply.
 
 Record `category_source` and `category_conf` for every assignment.
 
@@ -219,7 +239,8 @@ Providers: **Anthropic** (Claude API) and **OpenAI**. One provider is active at 
 - `llm/client.py` exposes one provider-neutral interface (structured output, tool use). Each provider is an adapter in `llm/providers/` (`anthropic.py`, `openai.py`); features never branch on provider.
 - Redaction, caching, schema validation and cost logging live in `client.py` and run the same way for every provider.
 - **No automatic failover between providers.** If the active provider errors, the call fails and the cascade falls through. Silently retrying on the other vendor would send data to a service the user didn't choose.
-- The cache key includes the model name, so switching provider or model never serves another model's cached answer.
+- The cache key is sha256 of (provider, model, prompt name, prompt version, output schema, redacted input), so switching provider, model, prompt or category list never serves a stale answer.
+- `llm_calls` logs every request (provider, model, prompt + version, cache hit, ok/error class, token counts), never content.
 
 ### 7.1 Merchant normalization (Phase 2)
 - Input: list of `normalized_key` strings + our category list.
@@ -250,6 +271,9 @@ See §3.4. This is the only feature that sends raw statement text; requires expl
 
 ### 7.5 LLM evaluation
 - `evals/merchants.jsonl`: ~200 hand-labeled raw descriptions → expected clean name + category. Target ≥ 90% category agreement.
+  - Cases list every acceptable category (`accept_categories`); a few expect `Unknown` so abstaining is tested too. Agreement counts an accepted category or its parent (reported separately). Names are reported, not gated, with a "hard names" score over cases where title-casing the key isn't already the answer.
+  - The runner uses the app's real path (production key cleanup → `suggest_merchants` → `LLMClient` → configured adapter), a fresh database per rep (no cache carry-over), and writes `results.jsonl`, `errors.jsonl` (failures never scored as wrong) and `summary.json` under `evals/results/` (gitignored).
+  - `make eval-selfcheck` runs offline oracle/null modes (free); `make eval` runs live.
 - `evals/questions.jsonl`: ~30 NL questions with expected numeric answers against a fixed synthetic database. Target: 100% of numbers match (tolerance: exact cents).
 - Evals run via `make eval` against the configured provider and model; required to pass before changing prompts, model, or provider.
 
@@ -259,7 +283,7 @@ See §3.4. This is the only feature that sends raw statement text; requires expl
 
 - Local DuckDB file at `data/spendsight.duckdb`; `data/` is gitignored.
 - Only the last 4 digits of any account number are stored.
-- `llm/redact.py` runs on every outbound payload: masks sequences of ≥ 6 digits, emails, phone numbers, and names from a user-configured list. Unit-tested.
+- `llm/redact.py` runs on every outbound payload: masks sequences of ≥ 6 digits, emails, phone numbers, and names from a user-configured list (`SPENDSIGHT_REDACT_NAMES`, comma-separated; kept out of logs and reprs). Unit-tested.
 - Default outbound LLM content: merchant description strings and aggregates only.
 - API keys read from `.env` (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`); only the active provider's key is used; never logged.
 - Settings toggle "Local only" disables all external LLM calls (app degrades gracefully: rules + ML + Chase categories).
@@ -272,8 +296,8 @@ See §3.4. This is the only feature that sends raw statement text; requires expl
 | Page | Contents |
 |---|---|
 | **Import** | Drag-and-drop CSV(s); detected account/format; preview first 10 rows; import summary (new, duplicates skipped, transfers found) |
-| **Overview** | Date range + account filters; KPI row (spent, income, net, vs. prior period); monthly spend stacked by parent category; top merchants; category donut/treemap |
-| **Transactions** | Searchable/filterable table; inline category edit with "apply to merchant"; source/confidence badge |
+| **Overview** | Date range + account filters; KPI row (spent, income, net, vs. the same-length prior period, shown only when that period has data); monthly spend stacked by parent category; top merchants; spend by category (ranked bar) |
+| **Transactions** | Search (description, merchant, memo) + date/account/category filters, transfers hidden by default; source/confidence badge; select a row to edit its category (locks that row), optionally "apply to all from this merchant" (sets the merchant default and re-runs the cascade, reporting rows a rule or earlier edit keeps elsewhere); "Reset to automatic" unlocks |
 | **Recurring** | Active subscriptions with cadence, amount, next date, annualized cost; dismiss / mark cancelled |
 | **Alerts** | Anomalies with explanations; dismiss |
 | **Forecast** | Month-to-date vs projected, by category |
@@ -281,6 +305,13 @@ See §3.4. This is the only feature that sends raw statement text; requires expl
 | **Settings** | Categories, rules, LLM on/off, model, thresholds, redaction names |
 
 Transfers are excluded from spend charts by default, with a toggle to show them.
+
+**Spend vs income** (one definition, the `flow` column of `v_transactions` / `v_spend`):
+- *Spend* = every outflow, plus inflows in a non-income category (a refund nets against the category it came from).
+- *Income* = inflows in an income category, and uncategorized inflows.
+- *Net* = income − spend = the plain sum of amounts.
+
+**Charts** follow one color mapping in `app/theme.py`: seven major parent categories own fixed palette slots and the rest fold into a neutral "Other", so a category's color never changes with rank or filters. Every chart has hover values and a table view.
 
 ---
 
@@ -315,7 +346,7 @@ spendsight/
 │   ├── ml/                  # classifier.py, recurring.py, anomalies.py, forecast.py
 │   ├── llm/                 # client.py, redact.py, cache.py, tools.py, prompts/, providers/
 │   ├── insights/            # metrics.py, summary.py
-│   └── app/                 # Streamlit: Home.py + pages/
+│   └── app/                 # Streamlit: Home.py router + views/ (not pages/: see Home.py)
 ├── tests/
 │   └── fixtures/            # synthetic Chase CSVs only — never real data
 └── evals/                   # merchants.jsonl, questions.jsonl, run_evals.py
@@ -326,17 +357,17 @@ spendsight/
 ## 12. Phased delivery & acceptance criteria
 
 ### Phase 1 — Import & dashboard
-- [ ] Imports both Chase CSV formats, including trailing-comma checking rows
-- [ ] Re-importing the same or overlapping file adds zero duplicates
-- [ ] Card payments detected as transfers on both sides and excluded from spend
-- [ ] Overview page with monthly spend by category (Chase categories mapped to taxonomy)
-- [ ] Totals match a hand-computed sum on fixtures to the cent
+- [x] Imports both Chase CSV formats, including trailing-comma checking rows
+- [x] Re-importing the same or overlapping file adds zero duplicates
+- [x] Card payments detected as transfers on both sides and excluded from spend
+- [x] Overview page with monthly spend by category (Chase categories mapped to taxonomy)
+- [x] Totals match a hand-computed sum on fixtures to the cent
 
 ### Phase 2 — Smart categorization
-- [ ] Deterministic merchant cleanup with unit tests for ≥ 30 real-world description patterns
-- [ ] LLM merchant normalization with caching; second run makes zero API calls
-- [ ] Categorization cascade with `category_source` recorded
-- [ ] Inline recategorization + "apply to merchant"
+- [x] Deterministic merchant cleanup with unit tests for ≥ 30 real-world description patterns
+- [x] LLM merchant normalization with caching; second run makes zero API calls
+- [x] Categorization cascade with `category_source` recorded (ML/LLM steps slot in with their features)
+- [x] Inline recategorization + "apply to merchant"
 - [ ] Merchant eval ≥ 90%
 
 ### Phase 3 — Patterns

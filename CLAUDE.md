@@ -6,7 +6,7 @@ Guidance for Claude when working in this repository. Read `SPEC.md` for full pro
 
 **Spendsight** — a local-first Python app that imports Chase checking and credit card CSVs, stores them in DuckDB, and provides spending visualizations (Streamlit), ML-based categorization/recurring/anomaly detection, and LLM-powered merchant cleanup and natural-language Q&A.
 
-Current phase: **Phase 1** (import & dashboard). Check the phase checklists in `SPEC.md §12` before starting work, and don't build later-phase features unless asked.
+Current phase: **Phase 2** (smart categorization). Phase 1 is complete. Check the phase checklists in `SPEC.md §12` before starting work, and don't build later-phase features unless asked.
 
 ## Commands
 
@@ -18,6 +18,7 @@ uv run pytest tests/ingest -k checking            # focused tests
 uv run ruff check . && uv run ruff format .       # lint + format
 uv run mypy src                  # type check
 make eval                        # LLM evals (hits the API; costs money)
+make eval-selfcheck              # offline eval harness check (free)
 ```
 
 Before calling a task done: `ruff check`, `mypy src`, and `pytest` must all pass.
@@ -97,6 +98,7 @@ SPENDSIGHT_LLM_MODEL=
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
 SPENDSIGHT_LOCAL_ONLY=false
+SPENDSIGHT_REDACT_NAMES=               # comma-separated names masked in LLM payloads
 SPENDSIGHT_DB_PATH=data/spendsight.duckdb
 SPENDSIGHT_ML_CONF_THRESHOLD=0.75
 ```

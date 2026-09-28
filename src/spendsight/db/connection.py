@@ -39,8 +39,11 @@ def applied_versions(conn: duckdb.DuckDBPyConnection) -> set[int]:
     return {int(row[0]) for row in rows}
 
 
-def migrate(conn: duckdb.DuckDBPyConnection) -> list[str]:
-    """Apply pending migrations, each in its own transaction. Returns names applied."""
+def migrate(conn: duckdb.DuckDBPyConnection, *, up_to: int | None = None) -> list[str]:
+    """Apply pending migrations, each in its own transaction. Returns names applied.
+
+    `up_to` stops after that version (for testing a migration against older data).
+    """
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -55,6 +58,8 @@ def migrate(conn: duckdb.DuckDBPyConnection) -> list[str]:
     for migration in load_migrations():
         if migration.version in done:
             continue
+        if up_to is not None and migration.version > up_to:
+            break
         conn.execute("BEGIN TRANSACTION")
         try:
             conn.execute(migration.sql)

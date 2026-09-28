@@ -5,9 +5,12 @@ description = "Local-first spending insights for Chase checking and credit card 
 readme = "SPEC.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "anthropic>=1.9.0",
     "duckdb>=1.5",
+    "openai>=3.20.0",
     "pandas>=3.0",
     "plotly>=6.0",
+    "pydantic>=2.13.5",
     "python-dotenv>=1.0",
     "streamlit>=1.40",
 ]

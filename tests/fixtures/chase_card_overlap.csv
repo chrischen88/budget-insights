@@ -1,0 +1,5 @@
+Transaction Date,Post Date,Description,Category,Type,Amount,Memo
+01/28/2026,01/29/2026,SYNTH COFFEE CO,Food & Drink,Sale,-4.75,
+01/25/2026,01/26/2026,SYNTH GAS STATION,Gas,Sale,-40.00,
+01/20/2026,01/21/2026,SYNTH STREAMING,Entertainment,Sale,-15.49,Synthetic memo
+01/15/2026,01/15/2026,Payment Thank You-Mobile,,Payment,500.00,

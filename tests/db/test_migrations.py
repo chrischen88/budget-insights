@@ -16,6 +16,8 @@ EXPECTED_TABLES = {
     "recurring_series",
     "anomalies",
     "llm_cache",
+    "chase_category_mappings",
+    "llm_calls",
     "schema_migrations",
 }
 

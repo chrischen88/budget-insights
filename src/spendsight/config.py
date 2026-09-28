@@ -31,6 +31,9 @@ class Settings:
     # Keys are excluded from repr so they never end up in logs or tracebacks.
     anthropic_api_key: str | None = field(default=None, repr=False)
     openai_api_key: str | None = field(default=None, repr=False)
+    # People's names masked in every outbound LLM payload (llm/redact.py). Personal data,
+    # so kept out of repr too.
+    redact_names: tuple[str, ...] = field(default=(), repr=False)
 
     @property
     def llm_api_key(self) -> str | None:
@@ -88,6 +91,11 @@ def settings_from_env(env: Mapping[str, str]) -> Settings:
         ),
         anthropic_api_key=env.get("ANTHROPIC_API_KEY") or None,
         openai_api_key=env.get("OPENAI_API_KEY") or None,
+        redact_names=tuple(
+            name.strip()
+            for name in env.get("SPENDSIGHT_REDACT_NAMES", "").split(",")
+            if name.strip()
+        ),
     )
 
 

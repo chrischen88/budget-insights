@@ -116,3 +116,10 @@ def test_openai_key_not_in_repr() -> None:
 def test_unknown_provider_rejected() -> None:
     with pytest.raises(ConfigError):
         settings_from_env({"SPENDSIGHT_LLM_PROVIDER": "gemini"})
+
+
+def test_redact_names_parsed_and_hidden() -> None:
+    s = settings_from_env({"SPENDSIGHT_REDACT_NAMES": " Jane Sample, ,Bob "})
+    assert s.redact_names == ("Jane Sample", "Bob")
+    assert "Jane" not in repr(s)
+    assert settings_from_env({}).redact_names == ()

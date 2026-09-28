@@ -11,6 +11,9 @@ data/*
 *.pdf
 !tests/fixtures/**/*.pdf
 
+# Eval run outputs (model responses; regenerate with make eval)
+evals/results/
+
 # Secrets
 .env
 

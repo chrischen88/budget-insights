@@ -21,9 +21,13 @@ typecheck:
 # Everything that must pass before a task is done.
 check: lint typecheck test
 
-# Hits the real LLM API and costs money. Not part of `check`.
+# Hits the real LLM API (configured provider/model) and costs money. Not part of `check`.
 eval:
-	@test -f evals/run_evals.py || { echo "evals/run_evals.py not implemented yet (Phase 2)"; exit 1; }
-	uv run python evals/run_evals.py
+	uv run python -m evals.run_evals --yes
 
-.PHONY: install app test lint format typecheck check eval
+# Free offline harness self-check: oracle must score 100%, null only the abstain cases.
+eval-selfcheck:
+	uv run python -m evals.run_evals --mode oracle
+	uv run python -m evals.run_evals --mode null
+
+.PHONY: install app test lint format typecheck check eval eval-selfcheck
