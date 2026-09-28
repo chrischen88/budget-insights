@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC, date, datetime
+
 import duckdb
 import streamlit as st
 
@@ -23,3 +25,9 @@ def get_connection() -> duckdb.DuckDBPyConnection:
     """A cursor for this script run. Streamlit runs sessions on separate threads and a
     DuckDB connection must not be shared across threads; cursors are cheap and safe."""
     return _database(str(get_settings().db_path)).cursor()
+
+
+def local_today() -> date:
+    """Today's date in the machine's local timezone: statement dates are local calendar
+    dates. Logic takes `today` as a parameter; only pages call this."""
+    return datetime.now(UTC).astimezone().date()

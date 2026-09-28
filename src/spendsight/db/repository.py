@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from typing import Literal
+from typing import Any, Literal
 
 import duckdb
 import pandas as pd
@@ -358,6 +358,8 @@ _UNENFORCED_REFERENCES = (
     ("merchants.default_category_id", "merchants", "default_category_id", "categories"),
     ("transactions.merchant_id", "transactions", "merchant_id", "merchants"),
     ("transactions.category_id", "transactions", "category_id", "categories"),
+    ("recurring_series.merchant_id", "recurring_series", "merchant_id", "merchants"),
+    ("anomalies.transaction_id", "anomalies", "transaction_id", "transactions"),
 )
 
 
@@ -612,3 +614,234 @@ def save_llm_merchant_names(
         ).fetchall()
         written += len(changed)
     return written
+
+
+def recurring_inputs(conn: duckdb.DuckDBPyConnection) -> pd.DataFrame:
+    """Outflows eligible for recurring detection: merchant, date, amount_cents (< 0).
+
+    Transfers, transfer candidates (e.g. an autopay whose card side isn't imported) and
+    excluded rows are left out: a card payment is not a subscription.
+    """
+    cursor = conn.execute(
+        """
+        SELECT merchant_id, txn_date AS date, amount_cents FROM transactions
+        WHERE amount_cents < 0 AND merchant_id IS NOT NULL
+          AND NOT is_transfer AND NOT transfer_candidate AND NOT is_excluded
+        ORDER BY merchant_id, txn_date
+        """
+    )
+    columns = [d[0] for d in cursor.description]
+    return pd.DataFrame(cursor.fetchall(), columns=columns)
+
+
+def save_recurring_series(conn: duckdb.DuckDBPyConnection, series: pd.DataFrame) -> int:
+    """Replace detection results. Columns: merchant_id, cadence_days, typical_cents,
+    last_seen, next_expected. Dismissed and cancelled series keep the user's choice;
+    series no longer detected are removed unless the user dismissed or cancelled them.
+    Returns the number of detected series.
+    """
+    conn.register("staged_series", series)
+    try:
+        conn.execute(
+            """
+            DELETE FROM recurring_series
+            WHERE status IS DISTINCT FROM 'dismissed' AND cancelled_on IS NULL
+              AND merchant_id NOT IN (SELECT CAST(merchant_id AS INTEGER) FROM staged_series)
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO recurring_series
+                (merchant_id, cadence_days, typical_cents, last_seen, next_expected, status)
+            SELECT CAST(merchant_id AS INTEGER), CAST(cadence_days AS INTEGER),
+                   CAST(typical_cents AS BIGINT), CAST(last_seen AS DATE),
+                   CAST(next_expected AS DATE), 'active'
+            FROM staged_series
+            ON CONFLICT (merchant_id) DO UPDATE SET
+                cadence_days = excluded.cadence_days,
+                typical_cents = excluded.typical_cents,
+                last_seen = excluded.last_seen,
+                next_expected = excluded.next_expected
+            """
+        )
+    finally:
+        conn.unregister("staged_series")
+    return len(series)
+
+
+@dataclass(frozen=True)
+class StoredSeries:
+    id: int
+    merchant: str
+    cadence_days: int
+    typical_cents: int
+    last_seen: date
+    next_expected: date
+    status: str | None
+    cancelled_on: date | None
+
+
+def list_recurring_series(conn: duckdb.DuckDBPyConnection) -> list[StoredSeries]:
+    """Every stored series with its merchant's display name."""
+    rows = conn.execute(
+        """
+        SELECT s.id, COALESCE(m.clean_name, m.normalized_key), s.cadence_days,
+               s.typical_cents, s.last_seen, s.next_expected, s.status, s.cancelled_on
+        FROM recurring_series s
+        JOIN merchants m ON m.id = s.merchant_id
+        ORDER BY s.id
+        """
+    ).fetchall()
+    return [
+        StoredSeries(int(r[0]), str(r[1]), int(r[2]), int(r[3]), r[4], r[5], r[6], r[7])
+        for r in rows
+    ]
+
+
+def latest_transaction_date(conn: duckdb.DuckDBPyConnection) -> date | None:
+    """The newest imported transaction date: how far the data reaches."""
+    row = conn.execute("SELECT max(txn_date) FROM transactions").fetchone()
+    return None if row is None else row[0]
+
+
+def dismiss_recurring(conn: duckdb.DuckDBPyConnection, series_id: int) -> bool:
+    """User: not a subscription. Kept across re-detection. Returns whether it existed."""
+    changed = conn.execute(
+        "UPDATE recurring_series SET status = 'dismissed' WHERE id = ? RETURNING id",
+        [series_id],
+    ).fetchall()
+    return bool(changed)
+
+
+def cancel_recurring(conn: duckdb.DuckDBPyConnection, series_id: int, on: date) -> bool:
+    """User: cancelled this subscription on `on`. Kept across re-detection."""
+    changed = conn.execute(
+        "UPDATE recurring_series SET cancelled_on = ? WHERE id = ? RETURNING id",
+        [on, series_id],
+    ).fetchall()
+    return bool(changed)
+
+
+def restore_recurring(conn: duckdb.DuckDBPyConnection, series_id: int) -> bool:
+    """Undo a dismissal or cancellation. Detection may remove it again if the pattern
+    no longer holds."""
+    changed = conn.execute(
+        "UPDATE recurring_series SET status = 'active', cancelled_on = NULL "
+        "WHERE id = ? RETURNING id",
+        [series_id],
+    ).fetchall()
+    return bool(changed)
+
+
+def anomaly_inputs(conn: duckdb.DuckDBPyConnection) -> list[tuple[Any, ...]]:
+    """Outflows eligible for anomaly detection, with display names for explanations:
+    (id, account_id, account, merchant_id, merchant, category_id, category, date,
+    amount_cents). Same exclusions as recurring detection: transfers, transfer candidates,
+    excluded rows."""
+    return conn.execute(
+        """
+        SELECT t.id, t.account_id, a.display_name, t.merchant_id,
+               COALESCE(m.clean_name, m.normalized_key), t.category_id, c.name,
+               t.txn_date, t.amount_cents
+        FROM transactions t
+        JOIN accounts a ON a.id = t.account_id
+        JOIN merchants m ON m.id = t.merchant_id
+        LEFT JOIN categories c ON c.id = t.category_id
+        WHERE t.amount_cents < 0
+          AND NOT t.is_transfer AND NOT t.transfer_candidate AND NOT t.is_excluded
+        ORDER BY t.txn_date, t.id
+        """
+    ).fetchall()
+
+
+def undismissed_series_merchants(conn: duckdb.DuckDBPyConnection) -> set[int]:
+    """Merchants with a recurring series the user hasn't dismissed (price-increase check)."""
+    rows = conn.execute(
+        "SELECT merchant_id FROM recurring_series WHERE status IS DISTINCT FROM 'dismissed'"
+    ).fetchall()
+    return {int(r[0]) for r in rows}
+
+
+def save_anomalies(conn: duckdb.DuckDBPyConnection, anomalies: pd.DataFrame) -> int:
+    """Replace detection results. Columns: transaction_id, kind, score, explanation.
+    Dismissed anomalies keep the user's choice and survive even when no longer detected;
+    others that are no longer detected are removed. Returns the number detected."""
+    conn.register("staged_anomalies", anomalies)
+    try:
+        conn.execute(
+            """
+            DELETE FROM anomalies
+            WHERE NOT dismissed
+              AND NOT EXISTS (
+                  SELECT 1 FROM staged_anomalies s
+                  WHERE CAST(s.transaction_id AS TEXT) = anomalies.transaction_id
+                    AND CAST(s.kind AS TEXT) = anomalies.kind)
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO anomalies (transaction_id, kind, score, explanation, dismissed)
+            SELECT CAST(transaction_id AS TEXT), CAST(kind AS TEXT),
+                   CAST(score AS DOUBLE), CAST(explanation AS TEXT), FALSE
+            FROM staged_anomalies
+            ON CONFLICT (transaction_id, kind) DO UPDATE SET
+                score = excluded.score,
+                explanation = excluded.explanation
+            """
+        )
+    finally:
+        conn.unregister("staged_anomalies")
+    return len(anomalies)
+
+
+@dataclass(frozen=True)
+class StoredAnomaly:
+    transaction_id: str
+    kind: str
+    date: date
+    merchant: str
+    account: str
+    amount_cents: int
+    explanation: str
+    dismissed: bool
+
+
+def list_anomalies(
+    conn: duckdb.DuckDBPyConnection,
+    start: date,
+    end: date,
+    *,
+    include_dismissed: bool = False,
+) -> list[StoredAnomaly]:
+    """Anomalies on transactions dated start..end, newest first."""
+    rows = conn.execute(
+        """
+        SELECT an.transaction_id, an.kind, t.txn_date,
+               COALESCE(m.clean_name, m.normalized_key, t.raw_description),
+               a.display_name, t.amount_cents, an.explanation, an.dismissed
+        FROM anomalies an
+        JOIN transactions t ON t.id = an.transaction_id
+        JOIN accounts a ON a.id = t.account_id
+        LEFT JOIN merchants m ON m.id = t.merchant_id
+        WHERE t.txn_date BETWEEN ? AND ? AND (? OR NOT an.dismissed)
+        ORDER BY t.txn_date DESC, an.kind, an.transaction_id
+        """,
+        [start, end, include_dismissed],
+    ).fetchall()
+    return [
+        StoredAnomaly(
+            str(r[0]), str(r[1]), r[2], str(r[3]), str(r[4]), int(r[5]), str(r[6]), bool(r[7])
+        )
+        for r in rows
+    ]
+
+
+def set_anomaly_dismissed(
+    conn: duckdb.DuckDBPyConnection, transaction_id: str, kind: str, dismissed: bool
+) -> bool:
+    """Dismiss (or restore) one alert. Returns whether it existed."""
+    changed = conn.execute(
+        "UPDATE anomalies SET dismissed = ? WHERE transaction_id = ? AND kind = ? RETURNING 1",
+        [dismissed, transaction_id, kind],
+    ).fetchall()
+    return bool(changed)

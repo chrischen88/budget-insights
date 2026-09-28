@@ -5,6 +5,10 @@ import pytest
 
 from spendsight.db import repository
 from spendsight.db.connection import migrate
+from spendsight.enrich.categorize_runner import run_categorization
+from spendsight.enrich.merchant_runner import run_merchant_linking
+from spendsight.enrich.transfer_runner import run_transfer_detection
+from spendsight.ingest.importer import import_file
 from spendsight.pipeline import import_and_process
 from tests.conftest import fixture_bytes
 
@@ -34,10 +38,12 @@ def v7() -> duckdb.DuckDBPyConnection:
     """A database at version 7 with real-shaped data, including an anomaly row."""
     conn = duckdb.connect(":memory:")
     migrate(conn, up_to=7)
-    import_and_process(conn, fixture_bytes("chase_card_jan.csv"), filename="c.csv", last4="0000")
-    import_and_process(
-        conn, fixture_bytes("chase_checking_jan.csv"), filename="k.csv", last4="0000"
-    )
+    # Only the stages that existed at version 7; later pipeline steps need later schema.
+    import_file(conn, fixture_bytes("chase_card_jan.csv"), filename="c.csv", last4="0000")
+    import_file(conn, fixture_bytes("chase_checking_jan.csv"), filename="k.csv", last4="0000")
+    run_transfer_detection(conn)
+    run_merchant_linking(conn)
+    run_categorization(conn)
     conn.execute(
         "INSERT INTO anomalies (transaction_id, kind, score, explanation) "
         "SELECT id, 'amount_outlier', 3.5, 'synthetic' FROM transactions LIMIT 1"
@@ -56,7 +62,7 @@ def test_problem_reproduces_before_008(v7: duckdb.DuckDBPyConnection) -> None:
 
 def test_008_preserves_every_row(v7: duckdb.DuckDBPyConnection) -> None:
     before = _snapshot(v7)
-    assert migrate(v7)[0] == "008_mutable_reference_columns.sql"
+    assert migrate(v7, up_to=8) == ["008_mutable_reference_columns.sql"]
     assert _snapshot(v7) == before
     assert repository.integrity_problems(v7) == []
 
@@ -73,13 +79,13 @@ def test_edits_work_after_008(v7: duckdb.DuckDBPyConnection) -> None:
 
 
 def test_kept_foreign_keys_still_enforced(v7: duckdb.DuckDBPyConnection) -> None:
-    migrate(v7)
+    migrate(v7, up_to=8)
     # Deleting a category used by a rule is still blocked.
     with pytest.raises(duckdb.ConstraintException):
         v7.execute(
             "DELETE FROM categories WHERE id = (SELECT category_id FROM category_rules LIMIT 1)"
         )
-    # Anomalies must still point at a real transaction.
+    # Anomalies still pointed at a real transaction after 008 (migration 011 drops it).
     with pytest.raises(duckdb.ConstraintException):
         v7.execute("INSERT INTO anomalies (transaction_id, kind) VALUES ('missing', 'duplicate')")
 

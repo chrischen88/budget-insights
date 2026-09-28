@@ -12,6 +12,8 @@ from spendsight.enrich.merchant_runner import run_merchant_linking
 from spendsight.enrich.transfer_runner import TransferRunResult, run_transfer_detection
 from spendsight.ingest.importer import ImportResult, import_file
 from spendsight.llm.client import LLMClient
+from spendsight.ml.anomaly_runner import run_anomaly_detection
+from spendsight.ml.recurring_runner import run_recurring_detection
 
 
 @dataclass(frozen=True)
@@ -21,6 +23,8 @@ class ImportSummary:
     merchants_linked: int
     categorized: int
     naming: NamingResult | None = None  # None when LLM features are off
+    recurring_series: int = 0
+    anomalies: int = 0
 
 
 def import_and_process(
@@ -42,10 +46,14 @@ def import_and_process(
     merchants_linked = run_merchant_linking(conn)
     naming = run_merchant_naming(conn, llm) if llm is not None else None
     categorized = run_categorization(conn)
+    recurring_series = run_recurring_detection(conn)
+    anomalies = run_anomaly_detection(conn)
     return ImportSummary(
         imported=imported,
         transfers=transfers,
         merchants_linked=merchants_linked,
         categorized=categorized,
         naming=naming,
+        recurring_series=recurring_series,
+        anomalies=anomalies,
     )

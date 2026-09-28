@@ -18,6 +18,8 @@ navigation = st.navigation(
         st.Page(PAGES / "home.py", title="Home", default=True),
         st.Page(PAGES / "overview.py", title="Overview", url_path="overview"),
         st.Page(PAGES / "transactions.py", title="Transactions", url_path="transactions"),
+        st.Page(PAGES / "recurring.py", title="Recurring", url_path="recurring"),
+        st.Page(PAGES / "alerts.py", title="Alerts", url_path="alerts"),
         st.Page(PAGES / "import_page.py", title="Import", url_path="import"),
     ]
 )

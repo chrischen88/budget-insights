@@ -136,21 +136,22 @@ chase_category_mappings (
 
 recurring_series (
   id            INTEGER PRIMARY KEY,
-  merchant_id   INTEGER REFERENCES merchants(id),
+  merchant_id   INTEGER,               -- merchants.id (plain column, see below)
   cadence_days  INTEGER,               -- ~7, ~14, ~30, ~91, ~365
   typical_cents BIGINT,
   last_seen     DATE,
   next_expected DATE,
-  status        TEXT                   -- 'active' | 'lapsed' | 'dismissed'
-);
+  status        TEXT,                  -- 'active' | 'dismissed' (lapsed is derived at read time)
+  cancelled_on  DATE                   -- user marked it cancelled on this date
+);                                     -- unique per merchant_id
 
 anomalies (
-  transaction_id TEXT REFERENCES transactions(id),
+  transaction_id TEXT,                 -- transactions.id (plain column, see below)
   kind           TEXT,                 -- 'amount_outlier' | 'duplicate' | 'new_merchant_large' | 'price_increase'
   score          DOUBLE,
   explanation    TEXT,
   dismissed      BOOLEAN DEFAULT FALSE
-);
+);                                     -- unique per (transaction_id, kind)
 
 llm_cache (
   prompt_hash TEXT PRIMARY KEY,        -- sha256(model + prompt_version + input)
@@ -162,6 +163,8 @@ llm_cache (
 Seed `categories` with a two-level taxonomy (~12 parents, ~40 children). Users can add/rename.
 
 **Foreign keys on edited columns.** DuckDB runs an UPDATE of an indexed (e.g. foreign-key) column as delete + insert, which fails when other rows reference the table. So reference columns the app edits (`categories.parent_id`, `merchants.default_category_id`, `transactions.merchant_id`, `transactions.category_id`) are plain integers (migration 008). Repository writers validate them and `repository.integrity_problems()` checks for dangling references. Rule for new tables: a table that others reference must not have a foreign key on a column the app updates.
+
+DuckDB also rejects `UPDATE ... RETURNING` on any row another table references, even when the key is unchanged. So derived ML output (`recurring_series.merchant_id`, `anomalies.transaction_id`) holds plain references too (migration 011): a foreign key there would block recategorizing, "apply to merchant" and LLM naming. Rule: **nothing may hold a foreign key to `transactions` or `merchants`**; add the column to `integrity_problems()` instead.
 
 ---
 
@@ -227,6 +230,24 @@ Record `category_source` and `category_conf` for every assignment.
 | **Forecast** | Month-to-date spend + expected remaining recurring charges + per-category daily run-rate from trailing 90 days. Upgrade path: Prophet on monthly totals once ≥ 18 months of data | Transactions, recurring_series | Projected month-end spend by category with range | Backtest MAPE reported in UI; no hard target in v1 |
 
 Isolation Forest is a v2 option; start with the explainable methods above.
+
+**Recurring detection details** (`ml/recurring.py`):
+- Inputs: outflows with a merchant, excluding transfers, transfer candidates and excluded rows (an unpaired autopay is not a subscription). One charge per day; on a double-charge day the charge closest to the merchant's median is kept, so the duplicate doesn't hide the series (it's the anomaly detector's job).
+- Cadence windows (gap in days): weekly 6–8, biweekly 12–16, monthly 26–35, quarterly 82–100, annual 350–380. The median gap picks the bucket; ≥ 75% of gaps must fit it or be one skipped period (~2× the cadence). Amount CV < 0.15.
+- One series per merchant (limitation: two subscriptions billed under one merchant key, e.g. two Apple services, are only found if one dominates).
+- `next_expected` steps by calendar month for monthly/quarterly/annual (Jan 31 → Feb 28/29), by days for weekly/biweekly. Annualized cost is exact integer cents: typical × 52/26/12/4/1.
+- Re-detection runs after every import, updates series in place, keeps user dismissals/cancellations, and removes series whose pattern no longer holds unless the user touched them.
+- Display status (`insights/recurring.py`): dismissed, then cancelled (user choices win), else **lapsed** when the reference date is past `next_expected` by more than the cadence window's slack (weekly 1, biweekly 2, monthly 5, quarterly 9, annual 15 days), else active. The reference date is the earlier of an injected `today` and the newest imported transaction, so a stale import doesn't lapse everything. Annualized totals count active series only.
+- Tested on `tests/synth.py`: planted weekly/biweekly/monthly/quarterly/annual series (price increases, a skipped month, a cancelled one, month-end billing, posting jitter) among noise; recall and precision ≥ 90% on 10 seeds.
+
+**Anomaly detection details** (`ml/anomalies.py`). Thresholds live in `AnomalyConfig`. Explanations are code templates, never LLM output.
+- Inputs: same outflows as recurring detection (no transfers, transfer candidates or excluded rows).
+- *Amount outlier*: modified z-score `0.6745 × (amount − median) / MAD` within the transaction's category > 3.5, **and** ≥ 2× the category median, **and** ≥ $50 above it (so a $30 coffee order isn't an alert). Needs ≥ 8 charges in the category; categories with MAD 0 (fixed amounts like rent) and uncategorized rows are skipped. *"$450.00 at Grocer is more than 5 times the typical Groceries charge ($90.00)."*
+- *Duplicate*: same account, merchant and exact amount within 3 days, amount ≥ $20 (two identical coffees aren't worth an alert). The later charge is flagged.
+- *New merchant, large*: the merchant's first-ever charge is ≥ $200 and falls ≥ 60 days after that account's first transaction (otherwise the first import flags every merchant).
+- *Price increase*: for merchants with a recurring series the user hasn't dismissed, a charge > 5% above the **highest** of its previous 3 charges (one alert per rise; a wobbling price isn't re-flagged). Same-day double charges collapse first, as in recurring detection.
+- One anomaly per (transaction, kind). Re-detection runs after every import, after recategorizing, and after dismissing/restoring a recurring series; it updates in place, keeps dismissals, and removes undismissed anomalies that no longer hold.
+- Tested on `tests/synth.py` `anomaly_dataset`: two years of heavy-tailed everyday spending with one planted anomaly of each kind; all found on 10 seeds at ≤ 1 alert/month (target ≤ 5).
 
 ---
 
@@ -299,7 +320,7 @@ See §3.4. This is the only feature that sends raw statement text; requires expl
 | **Overview** | Date range + account filters; KPI row (spent, income, net, vs. the same-length prior period, shown only when that period has data); monthly spend stacked by parent category; top merchants; spend by category (ranked bar) |
 | **Transactions** | Search (description, merchant, memo) + date/account/category filters, transfers hidden by default; source/confidence badge; select a row to edit its category (locks that row), optionally "apply to all from this merchant" (sets the merchant default and re-runs the cascade, reporting rows a rule or earlier edit keeps elsewhere); "Reset to automatic" unlocks |
 | **Recurring** | Active subscriptions with cadence, amount, next date, annualized cost; dismiss / mark cancelled |
-| **Alerts** | Anomalies with explanations; dismiss |
+| **Alerts** | Anomalies with explanations, last 90 days of data by default; dismiss / restore (show dismissed toggle) |
 | **Forecast** | Month-to-date vs projected, by category |
 | **Ask** | Chat box; answers with expandable tool/SQL trace |
 | **Settings** | Categories, rules, LLM on/off, model, thresholds, redaction names |
@@ -368,11 +389,11 @@ spendsight/
 - [x] LLM merchant normalization with caching; second run makes zero API calls
 - [x] Categorization cascade with `category_source` recorded (ML/LLM steps slot in with their features)
 - [x] Inline recategorization + "apply to merchant"
-- [ ] Merchant eval ≥ 90%
+- [x] Merchant eval ≥ 90% (95.8% with openai / gpt-4o-mini, 2026-09-28)
 
 ### Phase 3 — Patterns
-- [ ] Recurring detection page with annualized cost
-- [ ] Anomaly alerts with explanations
+- [x] Recurring detection page with annualized cost
+- [x] Anomaly alerts with explanations
 - [ ] ML classifier trains from user labels and slots into the cascade
 
 ### Phase 4 — Ask your data

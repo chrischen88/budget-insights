@@ -6,7 +6,9 @@ from datetime import date
 
 import pandas as pd
 
+from spendsight.db.repository import StoredAnomaly
 from spendsight.ingest.importer import ParsedFile
+from spendsight.insights.recurring import RecurringCharge
 from spendsight.money import format_cents
 
 FORMAT_LABELS = {"chase_card": "Chase credit card", "chase_checking": "Chase checking"}
@@ -123,3 +125,56 @@ def recategorize_message(
     if held_by_override:
         parts.append(f"{held_by_override} keep a category you set on them individually.")
     return " ".join(parts)
+
+
+STATUS_LABELS = {
+    "active": "Active",
+    "lapsed": "Lapsed",
+    "dismissed": "Not a subscription",
+    "cancelled": "Cancelled",
+}
+
+
+def recurring_table(charges: list[RecurringCharge]) -> pd.DataFrame:
+    """Recurring charges -> display table. Costs shown as positive amounts."""
+    return pd.DataFrame(
+        {
+            "Merchant": [c.merchant for c in charges],
+            "Cadence": [c.cadence.capitalize() for c in charges],
+            "Amount": [format_cents(c.typical_cents, signed=False) for c in charges],
+            "Last charge": [c.last_seen for c in charges],
+            "Next expected": [c.next_expected for c in charges],
+            "Annualized": [format_cents(c.annualized_cents, signed=False) for c in charges],
+            "Status": [
+                f"Cancelled {c.cancelled_on:%b %d, %Y}"
+                if c.cancelled_on is not None and c.status == "cancelled"
+                else STATUS_LABELS[c.status]
+                for c in charges
+            ],
+        }
+    )
+
+
+ALERT_LABELS = {
+    "amount_outlier": "Unusual amount",
+    "duplicate": "Possible duplicate",
+    "new_merchant_large": "Large new merchant",
+    "price_increase": "Price increase",
+}
+
+
+def alerts_table(alerts: list[StoredAnomaly], *, show_status: bool = False) -> pd.DataFrame:
+    """Alerts -> display table, in the order given (newest first)."""
+    frame = pd.DataFrame(
+        {
+            "Date": [a.date for a in alerts],
+            "Merchant": [a.merchant for a in alerts],
+            "Amount": [format_cents(a.amount_cents) for a in alerts],
+            "Alert": [ALERT_LABELS.get(a.kind, a.kind) for a in alerts],
+            "Why": [a.explanation for a in alerts],
+            "Account": [a.account for a in alerts],
+        }
+    )
+    if show_status:
+        frame["Status"] = ["Dismissed" if a.dismissed else "Open" for a in alerts]
+    return frame
