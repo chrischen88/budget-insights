@@ -8,6 +8,7 @@ from spendsight.enrich.categorize import (
     CascadeRow,
     CategoryAssignment,
     MerchantDefault,
+    MlSuggestion,
     categorize,
     compile_rules,
 )
@@ -124,3 +125,50 @@ def test_user_default_beats_llm_default_order() -> None:
         row("STARBUCKS", merchant=7), defaults={7: MerchantDefault(RESTAURANTS, "llm", 0.9)}
     )
     assert ruled.source == "rule"
+
+
+def _with_ml(
+    r: CascadeRow,
+    suggestion: MlSuggestion,
+    *,
+    defaults: dict[int, MerchantDefault] | None = None,
+    threshold: float = 0.75,
+) -> CategoryAssignment:
+    (a,) = categorize(
+        [r],
+        rules=RULES,
+        merchant_defaults=defaults or {},
+        chase_mapping=CHASE,
+        ml_suggestions={r.transaction_id: suggestion},
+        ml_threshold=threshold,
+    )
+    return a
+
+
+class TestMlStep:
+    def test_beats_llm_default_and_chase(self) -> None:
+        a = _with_ml(
+            row(merchant=7, chase="Groceries"),
+            MlSuggestion(COFFEE, 0.9),
+            defaults={7: MerchantDefault(RESTAURANTS, "llm", 0.95)},
+        )
+        assert a == CategoryAssignment("t1", COFFEE, "ml", 0.9)
+
+    def test_loses_to_rule_and_user_default(self) -> None:
+        assert one(row("NETFLIX.COM")).source == "rule"
+        a = _with_ml(row("NETFLIX.COM"), MlSuggestion(COFFEE, 0.99))
+        assert a.source == "rule"
+        a = _with_ml(
+            row(merchant=7),
+            MlSuggestion(COFFEE, 0.99),
+            defaults={7: MerchantDefault(RESTAURANTS, "user", 1.0)},
+        )
+        assert (a.category_id, a.source) == (RESTAURANTS, "user")
+
+    def test_threshold_boundary(self) -> None:
+        at = _with_ml(row(chase="Groceries"), MlSuggestion(COFFEE, 0.75))
+        assert (at.category_id, at.source) == (COFFEE, "ml")
+        below = _with_ml(row(chase="Groceries"), MlSuggestion(COFFEE, 0.749))
+        assert (below.category_id, below.source) == (GROCERIES, "chase")
+        configured = _with_ml(row(chase="Groceries"), MlSuggestion(COFFEE, 0.9), threshold=0.95)
+        assert configured.source == "chase"

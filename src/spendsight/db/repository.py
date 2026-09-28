@@ -207,6 +207,40 @@ def rows_for_categorization(
     ]
 
 
+@dataclass(frozen=True)
+class ClassifierRow:
+    id: str
+    key: str  # merchant normalized_key, or the raw description without a merchant
+    amount_cents: int
+    chase_category: str | None
+    category_id: int | None
+    locked: bool  # a per-transaction user override
+
+
+def classifier_rows(conn: duckdb.DuckDBPyConnection) -> list[ClassifierRow]:
+    """Every transaction with the classifier's features and its current category."""
+    rows = conn.execute(
+        """
+        SELECT t.id, COALESCE(m.normalized_key, t.raw_description), t.amount_cents,
+               t.chase_category, t.category_id, t.category_locked
+        FROM transactions t
+        LEFT JOIN merchants m ON m.id = t.merchant_id
+        ORDER BY t.id
+        """
+    ).fetchall()
+    return [
+        ClassifierRow(
+            str(r[0]),
+            str(r[1]),
+            int(r[2]),
+            None if r[3] is None else str(r[3]),
+            None if r[4] is None else int(r[4]),
+            bool(r[5]),
+        )
+        for r in rows
+    ]
+
+
 def category_rules(conn: duckdb.DuckDBPyConnection) -> list[tuple[int, str, int, int]]:
     """(id, pattern, category_id, priority) for every rule."""
     rows = conn.execute(
@@ -504,6 +538,19 @@ def clear_transaction_override(conn: duckdb.DuckDBPyConnection, transaction_id: 
         [transaction_id],
     ).fetchall()
     return bool(changed)
+
+
+def category_snapshot(conn: duckdb.DuckDBPyConnection) -> dict[str, int | None]:
+    """Every transaction's current category id, to see what a cascade run changed."""
+    rows = conn.execute("SELECT id, category_id FROM transactions").fetchall()
+    return {str(r[0]): None if r[1] is None else int(r[1]) for r in rows}
+
+
+def merchant_transaction_ids(conn: duckdb.DuckDBPyConnection, merchant_id: int) -> list[str]:
+    rows = conn.execute(
+        "SELECT id FROM transactions WHERE merchant_id = ?", [merchant_id]
+    ).fetchall()
+    return [str(r[0]) for r in rows]
 
 
 def merchant_category_breakdown(

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import duckdb
 
+from spendsight.enrich.categorize import DEFAULT_ML_THRESHOLD
 from spendsight.enrich.categorize_runner import run_categorization
 from spendsight.enrich.merchant_naming import NamingResult, run_merchant_naming
 from spendsight.enrich.merchant_runner import run_merchant_linking
@@ -35,6 +36,7 @@ def import_and_process(
     last4: str,
     display_name: str | None = None,
     llm: LLMClient | None = None,
+    ml_threshold: float = DEFAULT_ML_THRESHOLD,
 ) -> ImportSummary:
     """Import a file, then run the enrichment stages that exist so far.
 
@@ -45,7 +47,7 @@ def import_and_process(
     transfers = run_transfer_detection(conn)
     merchants_linked = run_merchant_linking(conn)
     naming = run_merchant_naming(conn, llm) if llm is not None else None
-    categorized = run_categorization(conn)
+    categorized = run_categorization(conn, ml_threshold=ml_threshold)
     recurring_series = run_recurring_detection(conn)
     anomalies = run_anomaly_detection(conn)
     return ImportSummary(

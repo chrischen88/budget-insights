@@ -12,7 +12,7 @@ from spendsight.app.formatting import (
     source_badge,
     transactions_table,
 )
-from spendsight.app.state import get_connection
+from spendsight.app.state import get_connection, get_settings
 from spendsight.db import repository
 from spendsight.enrich.recategorize import recategorize, reset_to_automatic
 from spendsight.insights import metrics
@@ -22,6 +22,7 @@ from spendsight.money import format_cents
 ALL, UNCATEGORIZED = "All categories", "Uncategorized"
 
 conn = get_connection()
+ml_threshold = get_settings().ml_conf_threshold
 st.title("Transactions")
 
 bounds = metrics.date_bounds(conn)
@@ -119,7 +120,11 @@ save_col, reset_col = st.columns([1, 3])
 if save_col.button("Save", type="primary", disabled=new_label is None, key=f"save-{txn_id}"):
     assert new_label is not None
     result = recategorize(
-        conn, txn_id, by_label[new_label], apply_to_merchant=bool(apply_to_merchant)
+        conn,
+        txn_id,
+        by_label[new_label],
+        apply_to_merchant=bool(apply_to_merchant),
+        ml_threshold=ml_threshold,
     )
     run_anomaly_detection(conn)  # category outliers depend on categories
     st.session_state["recategorize-message"] = recategorize_message(
@@ -130,10 +135,11 @@ if save_col.button("Save", type="primary", disabled=new_label is None, key=f"sav
         following=result.following,
         held_by_override=result.held_by_override,
         held_by_rule=result.held_by_rule,
+        relearned=result.relearned,
     )
     st.rerun()
 if bool(row["category_locked"]) and reset_col.button("Reset to automatic", key=f"reset-{txn_id}"):
-    reset_to_automatic(conn, txn_id)
+    reset_to_automatic(conn, txn_id, ml_threshold=ml_threshold)
     run_anomaly_detection(conn)
     st.session_state["recategorize-message"] = "Reset. The category is automatic again."
     st.rerun()

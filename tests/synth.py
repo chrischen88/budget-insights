@@ -10,6 +10,7 @@ from datetime import date, timedelta
 import pandas as pd
 
 from spendsight.ml.anomalies import Charge
+from spendsight.ml.classifier import Example, LabeledExample
 from spendsight.ml.recurring import add_months
 
 
@@ -285,3 +286,42 @@ def alerts_card_csv() -> bytes:
         lines.append(card_line(d, "SYNTH BISTRO", "-64.25", "Food & Drink"))
     lines.append(card_line(date(2025, 10, 20), "SYNTH FURNITURE", "-1450.00", "Home"))
     return "".join(lines).encode()
+
+
+# Category id -> (words that show up in merchant names, Chase categories seen, median cents)
+CLASSIFIER_CATEGORIES: dict[int, tuple[list[str], list[str], int]] = {
+    1: (["MARKET", "FOODS", "GROCERY", "FRESH", "SUPERMARKET"], ["Groceries"], 8000),
+    2: (["GRILL", "PIZZA", "TACOS", "KITCHEN", "BISTRO", "SUSHI"], ["Food & Drink"], 3500),
+    3: (["COFFEE", "CAFE", "ESPRESSO", "ROASTERS"], ["Food & Drink"], 600),
+    4: (["FUEL", "GAS", "PETRO", "OIL"], ["Gas"], 4500),
+    5: (["PHARMACY", "DRUG", "CLINIC", "DENTAL"], ["Health & Wellness", "Shopping"], 3000),
+    6: (["STORE", "OUTLET", "SHOP", "GOODS"], ["Shopping"], 5000),
+    7: (["AIRLINES", "HOTEL", "INN", "AIR"], ["Travel"], 40000),
+    8: (["PET", "VET", "ANIMAL"], ["Shopping"], 6000),
+}
+
+
+def _brand(rng: random.Random) -> str:
+    consonants, vowels = "BDFGKLMNPRSTVZ", "AEIOU"
+    return "".join(rng.choice(consonants) + rng.choice(vowels) for _ in range(rng.randint(2, 3)))
+
+
+def classifier_dataset(seed: int, merchants: int = 90) -> list[LabeledExample]:
+    """User-labeled transactions from `merchants` merchants across eight categories.
+
+    Names mix a random brand with a category word ("ZOKA PIZZA"); one in ten has only the
+    brand, so it must be placed by amount and Chase category. Chase's category is coarse
+    (coffee and restaurants share one; pets and pharmacies often read "Shopping").
+    Merchants have 1-12 transactions each, like real labels.
+    """
+    rng = random.Random(seed)
+    out: list[LabeledExample] = []
+    for _ in range(merchants):
+        category = rng.randint(1, len(CLASSIFIER_CATEGORIES))
+        words, chase, median = CLASSIFIER_CATEGORIES[category]
+        key = _brand(rng) if rng.random() < 0.1 else f"{_brand(rng)} {rng.choice(words)}"
+        chase_category = rng.choice(chase)
+        for _ in range(rng.randint(1, 12)):
+            cents = -max(100, round(rng.lognormvariate(math.log(median), 0.35)))
+            out.append(LabeledExample(Example(key, cents, chase_category), category))
+    return out

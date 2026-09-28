@@ -12,6 +12,7 @@ dependencies = [
     "plotly>=6.0",
     "pydantic>=2.13.5",
     "python-dotenv>=1.0",
+    "scikit-learn>=1.9.1",
     "streamlit>=1.40",
 ]
 
@@ -44,7 +45,7 @@ strict = true
 files = ["src"]
 
 [[tool.mypy.overrides]]
-module = ["plotly.*"]
+module = ["plotly.*", "sklearn.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

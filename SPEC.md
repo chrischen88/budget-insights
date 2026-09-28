@@ -216,7 +216,7 @@ The cascade re-runs over every unlocked transaction after each import, so edits 
 
 Record `category_source` and `category_conf` for every assignment.
 
-**Learning loop:** when the user recategorizes a transaction, offer "Apply to all from this merchant?" (updates `merchants.default_category_id`) and add the example to the classifier's training set. Retrain on demand or after every N=25 corrections.
+**Learning loop:** when the user recategorizes a transaction, offer "Apply to all from this merchant?" (updates `merchants.default_category_id`); the edit is also a training label. The classifier is retrained on **every cascade run** (after each import and each edit) rather than on demand or every N corrections: logistic regression on a few thousand rows takes milliseconds, so there is no stored model to go stale. The edit confirmation says how many other transactions the retrained classifier moved.
 
 ---
 
@@ -248,6 +248,14 @@ Isolation Forest is a v2 option; start with the explainable methods above.
 - *Price increase*: for merchants with a recurring series the user hasn't dismissed, a charge > 5% above the **highest** of its previous 3 charges (one alert per rise; a wobbling price isn't re-flagged). Same-day double charges collapse first, as in recurring detection.
 - One anomaly per (transaction, kind). Re-detection runs after every import, after recategorizing, and after dismissing/restoring a recurring series; it updates in place, keeps dismissals, and removes undismissed anomalies that no longer hold.
 - Tested on `tests/synth.py` `anomaly_dataset`: two years of heavy-tailed everyday spending with one planted anomaly of each kind; all found on 10 seeds at ≤ 1 alert/month (target ≤ 5).
+
+**Classifier details** (`ml/classifier.py`, run by `enrich/categorize_runner.py`):
+- Labels: locked per-transaction edits, plus this run's `rule` and `user` (merchant default) assignments, computed in a first cascade pass so they are current. Rows the classifier labeled (`ml`) are never labels, so it can't reinforce its own guesses. Off below 100 labels or with fewer than two categories.
+- Features: TF-IDF of character 3–5 grams (word-bounded) on the merchant's `normalized_key` (the raw description when there is no merchant), amount bucket with sign (< $5, < $20, < $50, < $100, < $250, < $1,000, ≥ $1,000), Chase category; one-hot. Logistic regression (C = 5).
+- Each merchant's rows share one unit of weight, so one busy merchant doesn't drown out the rest.
+- Predictions go to every row that rules and user merchant defaults didn't decide; step 4 applies those with probability ≥ `SPENDSIGHT_ML_CONF_THRESHOLD` (default 0.75), recorded as `category_source = 'ml'`, `category_conf` = the probability (3 places).
+- **Evaluation holds out merchants, not rows**: a labeled merchant is already caught by its merchant default, so the classifier only matters for merchants the user hasn't labeled, and a row split would leak. `merchant_holdout()` reports accuracy over all held-out rows (the acceptance target), plus accuracy and coverage of predictions at the threshold, which is what the cascade actually applies.
+- Tested on `tests/synth.py` `classifier_dataset` (≥ 300 labels, 55 merchants, eight categories, coarse Chase categories): all-rows held-out accuracy averages ≥ 85% over 10 seeds (one seed dips to ~80% when the only merchant with a telling word is held out; those misses are all below threshold); applied predictions are ≥ 95% accurate on every seed at ≥ 60% coverage.
 
 ---
 
@@ -394,7 +402,7 @@ spendsight/
 ### Phase 3 — Patterns
 - [x] Recurring detection page with annualized cost
 - [x] Anomaly alerts with explanations
-- [ ] ML classifier trains from user labels and slots into the cascade
+- [x] ML classifier trains from user labels and slots into the cascade
 
 ### Phase 4 — Ask your data
 - [ ] Tool-use chat with SELECT-only enforcement (tests prove INSERT/UPDATE/DROP/ATTACH are rejected)

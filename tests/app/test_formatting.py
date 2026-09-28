@@ -94,3 +94,22 @@ def test_recategorize_messages() -> None:
     assert message.startswith("2 of 5 SYNTH COFFEE CO transactions are now Coffee Shops.")
     assert "2 stay where a rule puts them" in message
     assert "1 keep a category you set" in message
+
+
+def test_recategorize_message_reports_relearned_rows() -> None:
+    common = {
+        "category": "Coffee Shops",
+        "merchant": "SYNTH COFFEE CO",
+        "merchant_rows": 3,
+        "following": 3,
+        "held_by_override": 0,
+        "held_by_rule": 0,
+    }
+    assert recategorize_message(**common, applied_to_merchant=False, relearned=1) == (
+        "Moved this transaction to Coffee Shops. Spendsight learned from this edit and "
+        "recategorized 1 other transaction."
+    )
+    assert recategorize_message(**common, applied_to_merchant=True, relearned=4).endswith(
+        "are now Coffee Shops. Spendsight learned from this edit and recategorized 4 other "
+        "transactions."
+    )

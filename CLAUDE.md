@@ -6,7 +6,7 @@ Guidance for Claude when working in this repository. Read `SPEC.md` for full pro
 
 **Spendsight** — a local-first Python app that imports Chase checking and credit card CSVs, stores them in DuckDB, and provides spending visualizations (Streamlit), ML-based categorization/recurring/anomaly detection, and LLM-powered merchant cleanup and natural-language Q&A.
 
-Current phase: **Phase 3** (patterns: recurring, anomalies, classifier). Phases 1 and 2 are complete (merchant eval passed with `openai` / `gpt-4o-mini`). Check the phase checklists in `SPEC.md §12` before starting work, and don't build later-phase features unless asked.
+Current phase: **Phase 3 complete**; Phase 4 (ask your data) is next. Phases 1 and 2 are complete (merchant eval passed with `openai` / `gpt-4o-mini`). Check the phase checklists in `SPEC.md §12` before starting work, and don't build later-phase features unless asked.
 
 ## Commands
 

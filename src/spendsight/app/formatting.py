@@ -113,9 +113,16 @@ def recategorize_message(
     following: int,
     held_by_override: int,
     held_by_rule: int,
+    relearned: int = 0,
 ) -> str:
+    learned = (
+        f" Spendsight learned from this edit and recategorized {relearned} other "
+        f"transaction{'s' if relearned != 1 else ''}."
+        if relearned
+        else ""
+    )
     if not applied_to_merchant:
-        return f"Moved this transaction to {category}."
+        return f"Moved this transaction to {category}.{learned}"
     parts = [f"{following} of {merchant_rows} {merchant} transactions are now {category}."]
     if held_by_rule:
         parts.append(
@@ -124,7 +131,7 @@ def recategorize_message(
         )
     if held_by_override:
         parts.append(f"{held_by_override} keep a category you set on them individually.")
-    return " ".join(parts)
+    return " ".join(parts) + learned
 
 
 STATUS_LABELS = {

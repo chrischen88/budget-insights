@@ -4,7 +4,7 @@ First match wins:
   1. user override       -> locked rows are never passed in
   2. rule                -> category_rules, lowest priority number first, then rule id
   3. merchant default    -> merchants.default_category_id set by the user
-  4. ML classifier       -> Phase 3
+  4. ML classifier       -> predictions passed in, used at or above the threshold
   5. LLM suggestion      -> merchants.default_category_id set by the LLM
   6. Chase fallback      -> chase_category_mappings
 A row nothing matches gets a clearing assignment, so stale categories don't linger.
@@ -26,6 +26,7 @@ RULE_CONF = 1.0
 USER_MERCHANT_CONF = 1.0
 # Chase's categories are coarse and sometimes wrong, so this is the least trusted source.
 CHASE_FALLBACK_CONF = 0.5
+DEFAULT_ML_THRESHOLD = 0.75  # SPEC.md §5.5; configurable as SPENDSIGHT_ML_CONF_THRESHOLD
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,12 @@ class Rule:
 class MerchantDefault:
     category_id: int
     source: Literal["user", "llm"]
+    conf: float
+
+
+@dataclass(frozen=True)
+class MlSuggestion:
+    category_id: int
     conf: float
 
 
@@ -86,11 +93,16 @@ def categorize(
     rules: list[Rule],
     merchant_defaults: Mapping[int, MerchantDefault],
     chase_mapping: Mapping[str, int],
+    ml_suggestions: Mapping[str, MlSuggestion] | None = None,
+    ml_threshold: float = DEFAULT_ML_THRESHOLD,
 ) -> list[CategoryAssignment]:
+    """`ml_suggestions` maps transaction id -> the classifier's best guess; only guesses
+    with conf >= ml_threshold are used."""
     chase_lookup = {normalize_chase_category(k): v for k, v in chase_mapping.items()}
+    confident = {txn: s for txn, s in (ml_suggestions or {}).items() if s.conf >= ml_threshold}
     out = []
     for row in rows:
-        out.append(_categorize_one(row, rules, merchant_defaults, chase_lookup))
+        out.append(_categorize_one(row, rules, merchant_defaults, chase_lookup, confident))
     return out
 
 
@@ -99,6 +111,7 @@ def _categorize_one(
     rules: list[Rule],
     merchant_defaults: Mapping[int, MerchantDefault],
     chase_lookup: Mapping[str, int],
+    ml_suggestions: Mapping[str, MlSuggestion],
 ) -> CategoryAssignment:
     txn = row.transaction_id
     for rule in rules:
@@ -107,7 +120,9 @@ def _categorize_one(
     default = merchant_defaults.get(row.merchant_id) if row.merchant_id is not None else None
     if default is not None and default.source == "user":
         return CategoryAssignment(txn, default.category_id, "user", default.conf)
-    # Step 4 (ML classifier) slots in here in Phase 3, ahead of the LLM's suggestion.
+    suggestion = ml_suggestions.get(txn)
+    if suggestion is not None:
+        return CategoryAssignment(txn, suggestion.category_id, "ml", suggestion.conf)
     if default is not None and default.source == "llm":
         return CategoryAssignment(txn, default.category_id, "llm", default.conf)
     chase_id = chase_lookup.get(normalize_chase_category(row.chase_category or ""))

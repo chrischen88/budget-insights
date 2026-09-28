@@ -22,7 +22,8 @@ from spendsight.pipeline import ImportSummary, import_and_process
 LAST4 = re.compile(r"[0-9]{4}")
 
 conn = get_connection()
-llm = build_client(get_settings(), conn)  # None when local-only or not configured
+settings = get_settings()
+llm = build_client(settings, conn)  # None when local-only or not configured
 
 st.title("Import")
 st.caption(
@@ -69,7 +70,12 @@ if uploads:
             try:
                 with st.spinner(f"Importing {filename}..."):
                     summary = import_and_process(
-                        conn, content, filename=filename, last4=last4, llm=llm
+                        conn,
+                        content,
+                        filename=filename,
+                        last4=last4,
+                        llm=llm,
+                        ml_threshold=settings.ml_conf_threshold,
                     )
                 results.append((filename, summary))
             except IngestError as exc:
